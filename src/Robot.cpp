@@ -19,13 +19,13 @@ class Robot : public frc::TimedRobot {
 public:
 	void RobotInit() override {
 //		m_chooser.AddDefault("Default Auto", &m_defaultAuto);
-		m_chooser.AddObject("My Auto", new BluePathways());
-		m_chooser.AddObject("My Auto", new MiddleBottom());
-		m_chooser.AddObject("My Auto", new MiddleTop());
-		m_chooser.AddObject("My Auto", new PinkPathways());
-		m_chooser.AddObject("My Auto", new RedDownwardPathway());
-		m_chooser.AddObject("My Auto", new RedPathway());
-		frc::SmartDashboard::PutData("Auto Modes", &m_chooser);
+		chooser.AddObject("Blue Pathway", std::shared_ptr<BluePathways>(new BluePathways()));
+		chooser.AddObject("Middle Bottom", std::shared_ptr<MiddleBottom>(new MiddleBottom()));
+		chooser.AddObject("Middle Top", std::shared_ptr<MiddleTop>(new MiddleTop()));
+		chooser.AddObject("Pink Pathway", std::shared_ptr<PinkPathways>(new PinkPathways()));
+		chooser.AddObject("Red Downward", std::shared_ptr<RedDownwardPathway>(new RedDownwardPathway()));
+		chooser.AddObject("Red Pathway", std::shared_ptr<RedPathway>(new RedPathway()));
+		frc::SmartDashboard::PutData("Auto Modes", &chooser);
 	}
 
 	/**
@@ -58,10 +58,33 @@ public:
 	void AutonomousInit() override {
 		std::string autoSelected = frc::SmartDashboard::GetString(
 				"Auto Selector", "Default");
-			m_autonomousCommand = m_chooser.GetSelected();
+		std::string gameData = frc::DriverStation::GetInstance().GetGameSpecificMessage();
+		std::string autoString = chooser.GetName();
+			autonomousCommand = chooser.GetSelected();
 
-		if (m_autonomousCommand != nullptr) {
-			m_autonomousCommand->Start();
+		if (autonomousCommand != nullptr) {
+			autonomousCommand->Start();
+		}
+		if (autoString == "Mid") {
+			if (gameData[0] == 'L') {
+				autonomousCommand.reset(new MiddleTop());
+			} else {
+				autonomousCommand.reset(new MiddleBottom());
+			}
+		}
+		if (autoString == "Left") {
+			if (gameData[0] == 'R'){
+				autonomousCommand.reset(new RedPathway());
+			} else {
+				autonomousCommand.reset(new PinkPathways());
+			}
+		}
+		if (autoString == "Right") {
+			if (gameData[0] == 'L') {
+				autonomousCommand.reset(new RedDownwardPathway());
+			} else {
+				autonomousCommand.reset(new BluePathways());
+			}
 		}
 	}
 
@@ -74,9 +97,9 @@ public:
 		// teleop starts running. If you want the autonomous to
 		// continue until interrupted by another command, remove
 		// this line or comment it out.
-		if (m_autonomousCommand != nullptr) {
-			m_autonomousCommand->Cancel();
-			m_autonomousCommand = nullptr;
+		if (autonomousCommand != nullptr) {
+			autonomousCommand->Cancel();
+			autonomousCommand = nullptr;
 		}
 	}
 
@@ -87,10 +110,11 @@ public:
 private:
 	// Have it null by default so that if testing teleop it
 	// doesn't have undefined behavior and potentially crash.
-	frc::Command* m_autonomousCommand = nullptr;
+	std::unique_ptr<frc::Command> autonomousCommand;
 //	ExampleCommand m_defaultAuto;
 //	MyAutoCommand m_myAuto;
-	frc::SendableChooser<frc::Command*> m_chooser;
+	//frc::SendableChooser<frc::Command*> m_chooser;
+	frc::SendableChooser<std::shared_ptr<frc::Command>> chooser;
 };
 //
 //START_ROBOT_CLASS(Robot)
