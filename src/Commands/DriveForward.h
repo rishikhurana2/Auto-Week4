@@ -14,7 +14,6 @@ private:
 	double setpoint;
 	WVPIDController * drivingPID;
 	double power;
-	double speed;
 public:
 	DriveForward(double distance);
 	void Initialize() override;

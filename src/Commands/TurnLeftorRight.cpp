@@ -26,12 +26,12 @@ void TurnLeftorRight::Initialize() {
 // Called repeatedly when this Command is scheduled to run
 void TurnLeftorRight::Execute() {
 	angleSpeed = 0.5;
-	power = anglePID->Tick(angleSpeed);
+	power = anglePID->Tick(CommandBase::drive->getAngle());
 	if (angpoint < 0) {
-		CommandBase::drive->tankDrive(power-0.25, power);
+		CommandBase::drive->tankDrive(power-0.25, 0.1 + power);
 	}
 	if (angpoint > 0) {
-		CommandBase::drive->tankDrive(power, power-0.25);
+		CommandBase::drive->tankDrive(0.1 + power, power-0.25);
 	}
 }
 

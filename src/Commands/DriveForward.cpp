@@ -8,11 +8,10 @@
 #include "DriveForward.h"
 
 DriveForward::DriveForward(double distance) :
-drivingPID(new WVPIDController(0.03, 0, 0, setpoint, false)) {
+drivingPID(new WVPIDController(0.03, 0, 0, distance, false)) {
 	// Use Requires() here to declare subsystem dependencies
-	// eg. Requires(Robot::chassis.get());
+	// eg. Requires(Robot::chassis.get());``
 	setpoint = distance;
-	speed = 0;
 	power = 0;
 	Requires(CommandBase::drive);
 }
@@ -24,16 +23,15 @@ void DriveForward::Initialize() {
 
 // Called repeatedly when this Command is scheduled to run
 void DriveForward::Execute() {
-	speed = 0.5;
-	power = drivingPID->Tick(speed);
+	power = drivingPID->Tick((CommandBase::drive->leftDistance() + CommandBase::drive->rightDistance())/2);
 	CommandBase::drive->tankDrive(power,power);
 
 }
 
 // Make this return true when this Command no longer needs to run execute()
 bool DriveForward::IsFinished() {
-	return (CommandBase::drive->leftDistance() + CommandBase::drive->rightDistance())/2 > setpoint;
-//	return abs(drivingPID->GetError()) < 1.5;
+//	return (CommandBase::drive->leftDistance() + CommandBase::drive->rightDistance())/2 > setpoint;
+	return abs(drivingPID->GetError()) < 1.5;
 }
 
 // Called once after isFinished returns true
