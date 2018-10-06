@@ -36,7 +36,6 @@ public:
 
 	// Create a single static instance of all of your subsystems
 	static DriveTrain* drive;
-
 };
 
 

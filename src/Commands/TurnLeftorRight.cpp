@@ -5,44 +5,48 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "DriveForward.h"
+#include <Commands/TurnLeftorRight.h>
 
-DriveForward::DriveForward(double distance) :
-drivingPID(new WVPIDController(0.03, 0, 0, setpoint, false)) {
+TurnLeftorRight::TurnLeftorRight(double anglePoint) :
+anglePID(new WVPIDController(0.02, 0, 0, angpoint, false))
+{
 	// Use Requires() here to declare subsystem dependencies
 	// eg. Requires(Robot::chassis.get());
-	setpoint = distance;
-	speed = 0;
-	power = 0;
 	Requires(CommandBase::drive);
+	angpoint = anglePoint;
+	power = 0;
+	angleSpeed = 0;
 }
 
 // Called just before this Command runs the first time
-void DriveForward::Initialize() {
-	CommandBase::drive->resetEncoders();
+void TurnLeftorRight::Initialize() {
+	CommandBase::drive->gyroReset();
 }
 
 // Called repeatedly when this Command is scheduled to run
-void DriveForward::Execute() {
-	speed = 0.5;
-	power = drivingPID->Tick(speed);
-	CommandBase::drive->tankDrive(power,power);
-
+void TurnLeftorRight::Execute() {
+	angleSpeed = 0.5;
+	power = anglePID->Tick(angleSpeed);
+	if (angpoint < 0) {
+		CommandBase::drive->tankDrive(power-0.25, power);
+	}
+	if (angpoint > 0) {
+		CommandBase::drive->tankDrive(power, power-0.25);
+	}
 }
 
 // Make this return true when this Command no longer needs to run execute()
-bool DriveForward::IsFinished() {
-	return (CommandBase::drive->leftDistance() + CommandBase::drive->rightDistance())/2 > setpoint;
-//	return abs(drivingPID->GetError()) < 1.5;
+bool TurnLeftorRight::IsFinished() {
+	return (CommandBase::drive->getAngle() >= angpoint);
 }
 
 // Called once after isFinished returns true
-void DriveForward::End() {
+void TurnLeftorRight::End() {
 	CommandBase::drive->tankDrive(0,0);
 }
 
 // Called when another command which requires one or more of the same
 // subsystems is scheduled to run
-void DriveForward::Interrupted() {
+void TurnLeftorRight::Interrupted() {
 
 }

@@ -28,7 +28,7 @@ void CommandBase::initialize()
 {
 
 	drive = new DriveTrain();
-	std::cout << "drivetrain constructor completed" << std::
+	std::cout << "drivetrain constructor completed" << std::endl;
 	//catcher = new Catcher();
 	//std::cout << "catcher constructor completed" << std::endl;
 	//lift = new Lift();

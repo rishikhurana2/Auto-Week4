@@ -8,9 +8,9 @@
 #include "DriveTrain.h"
 #include "../RobotMap.h"
 
-DriveTrain::DriveTrain() : Subsystem("DriveTrain") {
-	left(new TalonSRX(LEFTMOTOR)), right(new TalonSRX(RIGHTMOTOR))
-}
+DriveTrain::DriveTrain() : Subsystem("DriveTrain"),
+left(new TalonSRX(LEFTMOTOR)), right(new TalonSRX(RIGHTMOTOR)), gyro(new ADXRS450_Gyro())
+{}
 
 void DriveTrain::InitDefaultCommand() {
 	// Set the default command for a subsystem here.
@@ -32,66 +32,11 @@ void DriveTrain::tankDrive(double leftVal, double rightVal) {
 	right->Set(ControlMode::PercentOutput, DriveTrain::Limit(-rightVal, 1.0));
 }
 
-//void DriveTrain::arcadeDrive(double moveVal, double rotateVal) {
-//	double leftMotorOutput, rightMotorOutput;
-//
-///*
-//	TalonSRX::FeedbackDeviceStatus sensorStatus = left->IsSensorPresent(CANTalon::CtreMagEncoder_Relative);
-//	TalonSRX::FeedbackDeviceStatus sensorStatus2 = right->IsSensorPresent(CANTalon::CtreMagEncoder_Relative);
-//	std::cout << "Left, Right: " << sensorStatus << "   " << sensorStatus2 << std::endl;
-//*/
-//	// Standard ArcadeDriveTrain algorithm from Google
-//	if (moveVal > 0.0) {
-//		if (rotateVal > 0.0) {
-//			leftMotorOutput = moveVal - rotateVal;
-//			rightMotorOutput = max(moveVal, rotateVal);
-//		} else {
-//			leftMotorOutput = max(moveVal, -rotateVal);
-//			rightMotorOutput = moveVal + rotateVal;
-//		}
-//	} else {
-//		if (rotateVal > 0.0) {
-//			leftMotorOutput = -max(-moveVal, rotateVal);
-//			rightMotorOutput = moveVal + rotateVal;
-//		} else {
-//			leftMotorOutput = moveVal - rotateVal;
-//			rightMotorOutput = -max(-moveVal, -rotateVal);
-//		}
-//	}
-//
-//	left->Set(ControlMode::PercentOutput, DriveTrain::Limit(leftMotorOutput, 0.5));
-//	right->Set(ControlMode::PercentOutput, DriveTrain::Limit(rightMotorOutput, 0.5));
-//}
-
-//double DriveTrain::getAngle() {
-//	double angle = gyro->GetAngle();
-//	//-180 to 180
-//	while (angle > 180) {
-//		angle -= 360;
-//	}
-//	while (angle < -180) {
-//		angle += 360;
-//	}
-//	return angle;
-//}
-
-//void DriveTrain::gyroReset() {
-//	gyro->Calibrate();
-//}
-
-//void DriveTrain::gyroCalibrate(){
-//	gyro->Calibrate();
-//}
-
 void DriveTrain::resetEncoders(){
 	left->SetSelectedSensorPosition(0,0,10);
 	right->SetSelectedSensorPosition(0,0,10);
 }
 
-/* DriveTrain::setStartAbsTicks(){
-	startAbsTicks = left->GetSensorCollection().GetPulseWidthPosition();
-	cout << "Start: " << startAbsTicks << endl;
-}*/
 
 double DriveTrain::leftDistance() { //inches
 
@@ -119,10 +64,18 @@ double DriveTrain::rightDistance() { //inches
 
 
 }
+void DriveTrain::gyroReset() {
+	gyro->Calibrate();
+}
 
-//double DriveTrain::getSpeed(){
-//	return ((left->GetSensorCollection().GetPulseWidthVelocity()*10)/4096);
-	//return left()*(10/4096) * circumference;
-//}
-// Put methods for controlling this subsystem
-// here. Call these from Commands.
+double DriveTrain::getAngle() {
+	double angle = gyro->GetAngle();
+	//-180 to 180
+	while (angle > 180) {
+		angle -= 360;
+	}
+	while (angle < -180) {
+		angle += 360;
+	}
+	return angle;
+}

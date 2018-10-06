@@ -18,21 +18,19 @@ private:
 	// for methods that implement subsystem capabilities
 	TalonSRX* left;
 	TalonSRX* right;
-	//ADXRS450_Gyro* gyro;
+	ADXRS450_Gyro* gyro;
 	double circumference = 6 * M_PI; //diameter = 6 inches
 public:
 	DriveTrain();
 	void InitDefaultCommand();
 	void tankDrive(double leftVal, double rightVal);
-	//void arcadeDrive(double moveVal, double rotateVal);
-	double Limit(double num, double max);
-	//double getAngle();
+	void turn(double leftVal, double rightVal);
 	//double getSpeed();
-	//void gyroReset();
+	void gyroReset();
+	double getAngle();
+	double Limit(double num, double max);
 	double leftDistance(); //inches
 	double rightDistance(); //inches
 	void resetEncoders();
-	//void gyroCalibrate();
-
 };
 
